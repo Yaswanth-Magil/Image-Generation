@@ -3,15 +3,13 @@ import os
 import mimetypes
 import time
 import google.generativeai as genai
-from google.generativeai.types import Content, Part
-from google.generativeai.types import Image as GenAIImage
+from google.generativeai.types import GenerateContentConfig
 from PIL import Image
 from io import BytesIO
 import pandas as pd
 import streamlit as st
 import shutil
 from tqdm import tqdm
-
 # 🔧 Hardcoded output directories (inside a temp directory for download)
 TEMP_DIR = "temp_output"
 TOP_VIEW_DIR = os.path.join(TEMP_DIR, "top_view_tool")
