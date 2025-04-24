@@ -118,7 +118,6 @@
 #                 st.error("❌ Generation failed. Check logs or Excel file format.")
 
 
-
 import base64
 import os
 import mimetypes
@@ -272,7 +271,7 @@ st.title("🍽️ Gemini Dish Image Generator")
 input_option = st.selectbox("Choose input method:", ["Prompt", "Excel File"])
 
 if input_option == "Prompt":
-    prompt = st.text_area("Enter your prompt:")
+    prompt = st.text_area("Enter your prompt:", key="prompt_input")  # Added a key here
     if st.button("🚀 Generate Images"):
         if prompt:
             with st.spinner("🔄 Generating images..."):
