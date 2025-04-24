@@ -15,9 +15,6 @@ TEMP_DIR = "temp_output"
 TOP_VIEW_DIR = os.path.join(TEMP_DIR, "top_view_tool")
 FRONT_VIEW_DIR = os.path.join(TEMP_DIR, "front_view_tool")
 
-# API key is configured as the very first thing
-# API_KEY = "AIzaSyAxk2Wog2ylp7wuQgTGdQCakzJXMoRHzO8"
-# genai.configure(api_key=API_KEY)
 
 try:
     API_KEY = os.environ.get("GEMINI_API_KEY")
