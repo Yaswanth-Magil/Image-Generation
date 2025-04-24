@@ -118,7 +118,6 @@
 #                 st.error("❌ Generation failed. Check logs or Excel file format.")
 
 
-
 import base64
 import os
 import mimetypes
@@ -130,6 +129,7 @@ import pandas as pd
 import streamlit as st
 import shutil
 from tqdm import tqdm
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 # Output folders
 TEMP_DIR = "temp_output"
@@ -162,8 +162,21 @@ def save_and_resize_image(file_name, data, size=(1080, 550)):
     except Exception as e:
         print(f"❌ Error saving image: {e}")
 
+@retry(stop=stop_after_attempt(5),  # Retry up to 5 times
+       wait=wait_exponential(multiplier=1, min=1, max=10), # Exponential backoff
+       retry=retry_if_exception_type(Exception)) # Retry on any exception
+def generate_content_with_retry(model, prompt):
+    """
+    Generates content with retry logic.
+    """
+    response = model.generate_content(
+        prompt,  # Pass the prompt directly as a string
+    )
+    return response
+
+
 def generate_images_from_excel(excel_file_content):
-    model = genai.GenerativeModel("gemini-2.0-flash-exp-image-generation")
+    model = genai.GenerativeModel("gemini-pro-vision")  # Use gemini-pro-vision instead
 
     try:
         df = pd.read_excel(BytesIO(excel_file_content))
@@ -180,9 +193,7 @@ def generate_images_from_excel(excel_file_content):
 
     def generate_and_save(prompt, file_path):
         try:
-            response = model.generate_content(
-                prompt,  # Pass the prompt directly as a string
-            )
+            response = generate_content_with_retry(model, prompt)
 
             if response.parts: #Check that parts exits and is not empty
                 image_data = response.parts[0].data
@@ -214,16 +225,14 @@ def generate_images_from_excel(excel_file_content):
     return TEMP_DIR
 
 def generate_images_from_prompt(prompt):
-    model = genai.GenerativeModel("gemini-2.0-flash-exp-image-generation")
+    model = genai.GenerativeModel("gemini-pro-vision") # Use gemini-pro-vision instead
 
     os.makedirs(TOP_VIEW_DIR, exist_ok=True)
     os.makedirs(FRONT_VIEW_DIR, exist_ok=True)
 
     def generate_and_save(prompt, file_path):
         try:
-            response = model.generate_content(
-                prompt,  # Pass the prompt directly as a string
-            )
+            response = generate_content_with_retry(model, prompt)
 
             if hasattr(response, 'parts') and response.parts: #Check that parts exits and is not empty
                 image_data = response.parts[0].data
