@@ -117,7 +117,6 @@
 #             else:
 #                 st.error("❌ Generation failed. Check logs or Excel file format.")
 
-
 import base64
 import os
 import mimetypes
@@ -169,11 +168,12 @@ def generate_content_with_retry(model, prompt):
     """
     Generates content with retry logic.
     """
-    response = model.generate_content(
-        prompt,  # Pass the prompt directly as a string
-    )
-    return response
-
+    try:
+       response = model.generate_content(prompt) # Pass the prompt directly
+       return response
+    except Exception as e:
+        print(f"Retry attempt failed: {e}")  # Log the error during retry
+        raise  # Re-raise the exception to trigger retry
 
 def generate_images_from_excel(excel_file_content):
     model = genai.GenerativeModel("gemini-pro-vision")  # Use gemini-pro-vision instead
@@ -195,7 +195,7 @@ def generate_images_from_excel(excel_file_content):
         try:
             response = generate_content_with_retry(model, prompt)
 
-            if response.parts: #Check that parts exits and is not empty
+            if hasattr(response, 'parts') and response.parts: #Check that parts exits and is not empty
                 image_data = response.parts[0].data
                 ext = mimetypes.guess_extension("image/png") or ".png"
                 save_and_resize_image(file_path + ext, image_data)
