@@ -178,11 +178,13 @@ def generate_images_from_excel(excel_file_content):
 
     def generate_and_save(prompt, file_path):
         try:
-            response = model.generate_content([prompt]) # Pass prompt in a list
+            response = model.generate_content(
+                prompt,  # Pass the prompt directly as a string
+            )
 
             if response.parts: #Check that parts exits and is not empty
                 image_data = response.parts[0].data
-                ext = mimetypes.guess_extension(mimetypes.guess_type(file_path + ".png")[0]) or ".png"
+                ext = mimetypes.guess_extension("image/png") or ".png"
                 save_and_resize_image(file_path + ext, image_data)
                 return True
             else:
@@ -217,12 +219,13 @@ def generate_images_from_prompt(prompt):
 
     def generate_and_save(prompt, file_path):
         try:
-            response = model.generate_content([prompt]) # Pass prompt in a list
+            response = model.generate_content(
+                prompt,  # Pass the prompt directly as a string
+            )
 
-
-            if response.parts: #Check that parts exits and is not empty
+            if hasattr(response, 'parts') and response.parts: #Check that parts exits and is not empty
                 image_data = response.parts[0].data
-                ext = mimetypes.guess_extension(mimetypes.guess_type(file_path + ".png")[0]) or ".png"
+                ext = mimetypes.guess_extension("image/png") or ".png"
                 save_and_resize_image(file_path + ext, image_data)
                 return True
             else:
