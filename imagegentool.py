@@ -3,7 +3,6 @@ import os
 import mimetypes
 import time
 import google.generativeai as genai
-from google.generativeai.types import GenerateContentConfig
 from PIL import Image
 from io import BytesIO
 import pandas as pd
@@ -16,7 +15,10 @@ TEMP_DIR = "temp_output"
 TOP_VIEW_DIR = os.path.join(TEMP_DIR, "top_view_tool")
 FRONT_VIEW_DIR = os.path.join(TEMP_DIR, "front_view_tool")
 
-API_KEY = st.secrets["GEMINI_API_KEY"]  # Secure handling via Streamlit Secrets
+# API key is configured as the very first thing
+API_KEY = st.secrets["GEMINI_API_KEY"]
+genai.configure(api_key=API_KEY)
+
 REQUESTS_PER_MINUTE = 10
 DELAY_BETWEEN_REQUESTS = 60 / REQUESTS_PER_MINUTE
 
@@ -31,7 +33,6 @@ def save_and_resize_image(file_name, data, size=(1080, 550)):
         print(f"❌ Error saving image: {e}")
 
 def generate_images(excel_file_content):
-    genai.configure(api_key=API_KEY)
     model = genai.GenerativeModel("gemini-2.0-flash-exp-image-generation")
 
     try:
@@ -50,14 +51,18 @@ def generate_images(excel_file_content):
     def generate_and_save(prompt, file_path):
         try:
             response = model.generate_content(
-                [prompt],
-                generation_config=GenerateContentConfig(response_mime_type="image/png")
+                prompt,  # Pass the prompt directly as a string
+                mime_type="image/png" # Specify mime_type as a top-level parameter
             )
 
-            image_data = response.parts[0].data
-            ext = mimetypes.guess_extension("image/png") or ".png"
-            save_and_resize_image(file_path + ext, image_data)
-            return True
+            if hasattr(response, 'parts') and response.parts: #Check that parts exits and is not empty
+                image_data = response.parts[0].data
+                ext = mimetypes.guess_extension("image/png") or ".png"
+                save_and_resize_image(file_path + ext, image_data)
+                return True
+            else:
+                st.error(f"Empty response parts for prompt: {prompt}")
+                return False
         except Exception as e:
             st.error(f"Error generating image: {e}")
             return False
