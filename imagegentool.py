@@ -128,7 +128,7 @@ import pandas as pd
 import streamlit as st
 import shutil
 from tqdm import tqdm
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type, RetryError
 
 # Output folders
 TEMP_DIR = "temp_output"
@@ -176,7 +176,7 @@ def generate_content_with_retry(model, prompt):
         raise  # Re-raise the exception to trigger retry
 
 def generate_images_from_excel(excel_file_content):
-    model = genai.GenerativeModel("gemini-2.0-flash-exp-image-generation")  # Use gemini-pro-vision instead
+    model = genai.GenerativeModel("gemini-2.0-flash-exp-image-generation")
 
     try:
         df = pd.read_excel(BytesIO(excel_file_content))
@@ -297,10 +297,13 @@ elif input_option == "Excel File":
     if uploaded_file is not None:
         if st.button("🚀 Generate Images"):
             with st.spinner("🔄 Generating images..."):
-                output_dir = generate_images_from_excel(uploaded_file.read())
+                try:
+                    output_dir = generate_images_from_excel(uploaded_file.read())
 
-                if output_dir:
-                    st.success("✅ All images generated!")
-                    st.markdown(zip_and_download(output_dir), unsafe_allow_html=True)
-                else:
-                    st.error("❌ Generation failed. Check logs or Excel file format.")
+                    if output_dir:
+                        st.success("✅ All images generated!")
+                        st.markdown(zip_and_download(output_dir), unsafe_allow_html=True)
+                    else:
+                        st.error("❌ Generation failed. Check logs or Excel file format.")
+                except RetryError as e:
+                    st.error(f"❌ Image generation failed after multiple retries: {e}")
