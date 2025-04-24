@@ -117,7 +117,6 @@
 #             else:
 #                 st.error("❌ Generation failed. Check logs or Excel file format.")
 
-
 import base64
 import os
 import mimetypes
@@ -179,13 +178,11 @@ def generate_images_from_excel(excel_file_content):
 
     def generate_and_save(prompt, file_path):
         try:
-            response = model.generate_content(
-                prompt,  # Pass the prompt directly as a string
-            )
+            response = model.generate_content([prompt]) # Pass prompt in a list
 
-            if hasattr(response, 'parts') and response.parts: #Check that parts exits and is not empty
+            if response.parts: #Check that parts exits and is not empty
                 image_data = response.parts[0].data
-                ext = mimetypes.guess_extension("image/png") or ".png"
+                ext = mimetypes.guess_extension(mimetypes.guess_type(file_path + ".png")[0]) or ".png"
                 save_and_resize_image(file_path + ext, image_data)
                 return True
             else:
@@ -220,13 +217,12 @@ def generate_images_from_prompt(prompt):
 
     def generate_and_save(prompt, file_path):
         try:
-            response = model.generate_content(
-                prompt,  # Pass the prompt directly as a string
-            )
+            response = model.generate_content([prompt]) # Pass prompt in a list
 
-            if hasattr(response, 'parts') and response.parts: #Check that parts exits and is not empty
+
+            if response.parts: #Check that parts exits and is not empty
                 image_data = response.parts[0].data
-                ext = mimetypes.guess_extension("image/png") or ".png"
+                ext = mimetypes.guess_extension(mimetypes.guess_type(file_path + ".png")[0]) or ".png"
                 save_and_resize_image(file_path + ext, image_data)
                 return True
             else:
@@ -237,7 +233,6 @@ def generate_images_from_prompt(prompt):
             return False
 
 
-        
     safe_name = "dish" # Use a generic name since we don't have dish names from a file
 
     # Top View Prompt
