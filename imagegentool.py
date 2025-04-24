@@ -16,8 +16,20 @@ TOP_VIEW_DIR = os.path.join(TEMP_DIR, "top_view_tool")
 FRONT_VIEW_DIR = os.path.join(TEMP_DIR, "front_view_tool")
 
 # API key is configured as the very first thing
-API_KEY = "AIzaSyAxk2Wog2ylp7wuQgTGdQCakzJXMoRHzO8"
-genai.configure(api_key=API_KEY)
+# API_KEY = "AIzaSyAxk2Wog2ylp7wuQgTGdQCakzJXMoRHzO8"
+# genai.configure(api_key=API_KEY)
+
+try:
+    API_KEY = os.environ["GEMINI_API_KEY"]
+    genai.configure(api_key=API_KEY)
+    print("API Key loaded successfully from environment variable!")  # Debug print
+except KeyError:
+    st.error("❌  `GEMINI_API_KEY` environment variable not found. Please configure in GitHub Secrets and Streamlit.")
+    st.stop()
+except Exception as e:
+    st.error(f"❌ An error occurred while loading the API key: {e}")
+    st.stop()
+
 
 REQUESTS_PER_MINUTE = 10
 DELAY_BETWEEN_REQUESTS = 60 / REQUESTS_PER_MINUTE
