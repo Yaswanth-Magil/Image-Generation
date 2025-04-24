@@ -20,7 +20,7 @@ FRONT_VIEW_DIR = os.path.join(TEMP_DIR, "front_view_tool")
 # genai.configure(api_key=API_KEY)
 
 try:
-    API_KEY = os.environ["GEMINI_API_KEY"]
+    API_KEY = os.environ["API_KEY"]
     genai.configure(api_key=API_KEY)
     print("API Key loaded successfully from environment variable!")  # Debug print
 except KeyError:
