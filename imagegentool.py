@@ -181,7 +181,6 @@ def generate_images_from_excel(excel_file_content):
         try:
             response = model.generate_content(
                 prompt,  # Pass the prompt directly as a string
-                mime_type="image/png" # Specify mime_type as a top-level parameter
             )
 
             if hasattr(response, 'parts') and response.parts: #Check that parts exits and is not empty
@@ -223,7 +222,6 @@ def generate_images_from_prompt(prompt):
         try:
             response = model.generate_content(
                 prompt,  # Pass the prompt directly as a string
-                mime_type="image/png" # Specify mime_type as a top-level parameter
             )
 
             if hasattr(response, 'parts') and response.parts: #Check that parts exits and is not empty
@@ -271,7 +269,7 @@ st.title("🍽️ Gemini Dish Image Generator")
 input_option = st.selectbox("Choose input method:", ["Prompt", "Excel File"])
 
 if input_option == "Prompt":
-    prompt = st.text_area("Enter your prompt:", key="prompt_input")  # Added a key here
+    prompt = st.text_area("Enter your prompt:", key="prompt_input")
     if st.button("🚀 Generate Images"):
         if prompt:
             with st.spinner("🔄 Generating images..."):
