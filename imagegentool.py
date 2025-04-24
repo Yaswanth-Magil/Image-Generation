@@ -176,9 +176,9 @@ def generate_content_with_retry(model, prompt):
         raise  # Re-raise the exception to trigger retry
 
 def generate_images_from_excel(excel_file_content):
-    model = genai.GenerativeModel("gemini-pro-vision")  # Use gemini-pro-vision instead
+    model = genai.GenerativeModel("gemini-2.0-flash-exp-image-generation")  # Use gemini-pro-vision instead
 
-    try:
+    try
         df = pd.read_excel(BytesIO(excel_file_content))
         dishes_data = list(zip(df["dishes"], df["dish prompt"]))
     except KeyError as e:
