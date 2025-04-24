@@ -1,5 +1,5 @@
 pandas
 streamlit
-google-generativeai
+google-generativeai>=0.4.0 
 pillow
 tqdm
